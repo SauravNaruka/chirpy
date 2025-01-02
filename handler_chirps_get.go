@@ -15,13 +15,13 @@ func (cfg *apiConfig) handlerGetChirps(w http.ResponseWriter, r *http.Request) {
 
 	chirps := make([]Chirp, len(dChirps))
 
-	for i, dbChirp := range dChirps {
+	for i, c := range dChirps {
 		chirp := Chirp{
-			ID:        dbChirp.ID,
-			CreatedAt: dbChirp.CreatedAt,
-			UpdatedAt: dbChirp.UpdatedAt,
-			Body:      dbChirp.Body,
-			UserId:    dbChirp.UserID,
+			ID:        c.ID,
+			CreatedAt: c.CreatedAt,
+			UpdatedAt: c.UpdatedAt,
+			Body:      c.Body,
+			UserId:    c.UserID,
 		}
 		chirps[i] = chirp
 	}
