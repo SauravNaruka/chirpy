@@ -13,6 +13,9 @@ func (cfg *apiConfig) handlerUsersUpdate(w http.ResponseWriter, req *http.Reques
 		Password string `json:"password"`
 		Email    string `json:"email"`
 	}
+	type response struct {
+		User
+	}
 
 	token, err := auth.GetBearerToken(req.Header)
 	if err != nil {
@@ -22,7 +25,7 @@ func (cfg *apiConfig) handlerUsersUpdate(w http.ResponseWriter, req *http.Reques
 
 	userId, err := auth.ValidateJWT(token, cfg.jwtSecret)
 	if err != nil {
-		respondWithError(w, http.StatusUnauthorized, "Invalid token", err)
+		respondWithError(w, http.StatusUnauthorized, "Couldn't validate JWT", err)
 		return
 	}
 
@@ -30,13 +33,13 @@ func (cfg *apiConfig) handlerUsersUpdate(w http.ResponseWriter, req *http.Reques
 	decoder := json.NewDecoder(req.Body)
 	err = decoder.Decode(&param)
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "invalid parameters", err)
+		respondWithError(w, http.StatusBadRequest, "Couldn't decode parameters", err)
 		return
 	}
 
 	hashPassword, err := auth.HashPassword(param.Password)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "error while hashing password", err)
+		respondWithError(w, http.StatusInternalServerError, "Couldn't hash password", err)
 		return
 	}
 
@@ -50,10 +53,12 @@ func (cfg *apiConfig) handlerUsersUpdate(w http.ResponseWriter, req *http.Reques
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, User{
-		ID:        dbUser.ID,
-		CreatedAt: dbUser.CreatedAt,
-		UpdatedAt: dbUser.UpdatedAt,
-		Email:     dbUser.Email,
+	respondWithJSON(w, http.StatusOK, response{
+		User{
+			ID:        dbUser.ID,
+			CreatedAt: dbUser.CreatedAt,
+			UpdatedAt: dbUser.UpdatedAt,
+			Email:     dbUser.Email,
+		},
 	})
 }
