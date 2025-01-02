@@ -1,6 +1,11 @@
 package auth
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"crypto/rand"
+	"encoding/hex"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 func HashPassword(password string) (string, error) {
 	hashPass, err := bcrypt.GenerateFromPassword([]byte(password), 0)
@@ -13,4 +18,14 @@ func HashPassword(password string) (string, error) {
 
 func CheckPasswordHash(password, hash string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+}
+
+func MakeRefreshToken() (string, error) {
+	token := make([]byte, 32)
+	_, err := rand.Read(token)
+	if err != nil {
+		return "", err
+	}
+
+	return hex.EncodeToString(token), nil
 }
